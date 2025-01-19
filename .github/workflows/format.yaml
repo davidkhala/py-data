@@ -1,0 +1,12 @@
+name: davidkhala.data.format
+on: push
+jobs:
+  avro:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: davidkhala/poetry-buildpack@main
+        with:
+          tests: format/tests
+          test-entry-point: pytest
+          working-directory: format

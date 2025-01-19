@@ -11,6 +11,8 @@ python = "^3.10"
 # for extras
 fastavro = {version = "*", optional = true}
 
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
 
 [tool.poetry.extras]
 avro=["fastavro"]
