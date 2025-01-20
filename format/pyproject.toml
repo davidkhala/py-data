@@ -9,13 +9,14 @@ packages = [{ include = "davidkhala" }]
 [tool.poetry.dependencies]
 python = "^3.10"
 # for extras
-fastavro = {version = "*", optional = true}
-
+fastavro = { version = "*", optional = true }
+pyarrow = { version = "*", optional = true }
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 
 [tool.poetry.extras]
-avro=["fastavro"]
+avro = ["fastavro"]
+arrow = ['pyarrow']
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
