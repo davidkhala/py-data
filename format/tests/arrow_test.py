@@ -1,14 +1,15 @@
 import unittest
 from pyarrow import input_stream
 
+from davidkhala.data.format.arrow.fs import FS
 from davidkhala.data.format.arrow.gcp import GCS
+from davidkhala.data.format.parquet import Parquet
 
 
 class Samples(unittest.TestCase):
     def test_input_stream(self):
         """
         https://arrow.apache.org/docs/python/generated/pyarrow.BufferReader.html#pyarrow-bufferreader
-        :return:
         """
         #  Create an Arrow input stream and inspect it:
         data = b'reader data'
@@ -28,9 +29,15 @@ class Samples(unittest.TestCase):
         uri = "gcp-public-data-landsat/LC08/01/001/003/"
         file_list = fs.ls(uri)
 
-        f = fs.open_input_stream(file_list[0])
-        self.assertEqual(f.read(64), b'GROUP = FILE_HEADER\n  LANDSAT_SCENE_ID = "LC80010032013082LGN03"')
-        f.close()
+        with fs.open_input_stream(file_list[0]) as f:
+            self.assertEqual(f.read(64), b'GROUP = FILE_HEADER\n  LANDSAT_SCENE_ID = "LC80010032013082LGN03"')
+
+
+    def test_parquet2arrow(self):
+        parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
+        arrow_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow'
+        for record_batch in parquet.read_stream():
+            FS.write(arrow_path,record_batch)
 
 if __name__ == '__main__':
     unittest.main()
