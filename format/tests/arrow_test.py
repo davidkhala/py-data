@@ -1,4 +1,7 @@
+import os
 import unittest
+
+from davidkhala.gcp.auth.options import from_service_account
 from pyarrow import input_stream
 
 from davidkhala.data.format.arrow.fs import FS
@@ -21,9 +24,6 @@ class Samples(unittest.TestCase):
             self.assertEqual(stream.read(4), b'data')
 
     def test_GCS(self):
-        """
-        https://arrow.apache.org/docs/python/filesystems.html#google-cloud-storage-file-system
-        """
         fs = GCS(True)
 
         uri = "gcp-public-data-landsat/LC08/01/001/003/"
@@ -32,12 +32,43 @@ class Samples(unittest.TestCase):
         with fs.open_input_stream(file_list[0]) as f:
             self.assertEqual(f.read(64), b'GROUP = FILE_HEADER\n  LANDSAT_SCENE_ID = "LC80010032013082LGN03"')
 
-
     def test_parquet2arrow(self):
         parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
         arrow_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow'
         for record_batch in parquet.read_stream():
             FS.write(arrow_path,record_batch)
+class GCSTests(unittest.TestCase):
+    """
+    tests on private bucket
+    """
+    bucket= "davidkhala-data"
+    def test_ADC(self):
+        """
+        based on GCP ADC
+        """
+        fs = GCS()
+        for file in fs.ls(self.bucket):
+            print(file.path)
+    def test_service_account(self):
+        private_key = os.environ.get("PRIVATE_KEY")
+        fs = GCS(service_account=from_service_account(
+            client_email='data-integration@gcp-data-davidkhala.iam.gserviceaccount.com',
+            private_key=private_key,
+        ))
+        # TODO fs.connect
 
+
+
+    def test_private_bucket(self):
+        """
+        TODO
+        https://arrow.apache.org/docs/python/filesystems.html#google-cloud-storage-file-system
+
+
+        """
+        uri ="gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow"
+        parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
+        for record_batch in parquet.read_stream():
+            FS.write(uri,record_batch)
 if __name__ == '__main__':
     unittest.main()

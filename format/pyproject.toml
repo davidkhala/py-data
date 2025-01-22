@@ -11,12 +11,14 @@ python = "^3.10"
 # for extras
 fastavro = { version = "*", optional = true }
 pyarrow = { version = "*", optional = true }
+davidkhala-gcp = { version = "*", optional = true, extras = ["auth"] }
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 
 [tool.poetry.extras]
 avro = ["fastavro"]
 arrow = ['pyarrow']
+gcp = ['davidkhala-gcp']
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

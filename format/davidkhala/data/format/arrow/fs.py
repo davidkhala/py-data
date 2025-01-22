@@ -1,4 +1,4 @@
-from pyarrow import RecordBatch, RecordBatchFileWriter
+from pyarrow import RecordBatchFileWriter, RecordBatch, NativeFile
 from pyarrow.fs import FileSystem, FileInfo, FileSelector
 
 
@@ -15,6 +15,11 @@ class FS:
         return self.fs.get_file_info(FileSelector(base_dir, recursive=True))
 
     @staticmethod
-    def write(file_path, record_batch: RecordBatch):
-        with RecordBatchFileWriter(file_path, record_batch.schema) as writer:
+    def write(sink:str|NativeFile, record_batch: RecordBatch):
+        """
+        :param sink: Either a file path, or a writable file object [pyarrow.NativeFile].
+        :param record_batch:
+        :return:
+        """
+        with RecordBatchFileWriter(sink, record_batch.schema) as writer:
             writer.write(record_batch)
