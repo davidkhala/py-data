@@ -68,8 +68,7 @@ class GCSTests(unittest.TestCase):
     def test_parquet2arrow(self):
         uri = "gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow"
         parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
-        for record_batch in parquet.read_stream():
-            self.gcs.write(uri, record_batch)
+        self.gcs.write(uri, parquet.read_stream())
 
 
 if __name__ == '__main__':

@@ -1,6 +1,8 @@
+from typing import Iterable
+
 from davidkhala.gcp.auth import CredentialsInterface, ServiceAccountInfo
 from davidkhala.gcp.auth.options import from_service_account, ServiceAccount
-from pyarrow import NativeFile, RecordBatch
+from pyarrow import NativeFile, RecordBatch, Table
 from pyarrow.fs import GcsFileSystem, FileInfo
 
 from davidkhala.data.format.arrow.fs import FS
@@ -24,14 +26,23 @@ class GCS(FS):
     @staticmethod
     def from_service_account(info: ServiceAccountInfo):
         service_account = from_service_account(info)
-        ServiceAccount.token.fget(service_account) # credential validation included
+        ServiceAccount.token.fget(service_account)  # credential validation included
         return GCS(credentials=service_account.credentials)
+
     def ls(self, bucket: str) -> FileInfo | list[FileInfo]:
         return super().ls(bucket)
 
-    def write(self, uri, record_batch: RecordBatch):
-        stream: NativeFile
+    def write(self, uri, tables_or_batches: Iterable[RecordBatch | Table]):
+        """
+        pyarrow.lib.ArrowNotImplementedError: Append is not supported in GCS
+        :param uri:
+        :param tables_or_batches:
+        :return:
+        """
         if uri.startswith('gs://'):
             uri = uri[5:]
-        with self.fs.open_output_stream(uri) as stream:
-            FS.write(stream, record_batch)
+
+        stream: NativeFile = self.fs.open_output_stream(uri)
+        for table_or_batch in tables_or_batches:
+            FS.write(stream, table_or_batch)
+        stream.close()
