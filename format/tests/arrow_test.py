@@ -1,7 +1,6 @@
 import os
 import unittest
 
-from davidkhala.gcp.auth.options import from_service_account
 from pyarrow import input_stream
 
 from davidkhala.data.format.arrow.fs import FS
@@ -36,39 +35,42 @@ class Samples(unittest.TestCase):
         parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
         arrow_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow'
         for record_batch in parquet.read_stream():
-            FS.write(arrow_path,record_batch)
+            FS.write(arrow_path, record_batch)
+
+
 class GCSTests(unittest.TestCase):
     """
     tests on private bucket
     """
-    bucket= "davidkhala-data"
+    bucket = "davidkhala-data"
+
     def test_ADC(self):
         """
         based on GCP ADC
         """
-        fs = GCS()
-        for file in fs.ls(self.bucket):
+        for file in self.gcs.ls(self.bucket):
             print(file.path)
-    def test_service_account(self):
+
+    @property
+    def gcs(self):
         private_key = os.environ.get("PRIVATE_KEY")
-        fs = GCS(service_account=from_service_account(
-            client_email='data-integration@gcp-data-davidkhala.iam.gserviceaccount.com',
-            private_key=private_key,
-        ))
-        # TODO fs.connect
+        if private_key:
+            return GCS.from_service_account({
+                'client_email': 'data-integration@gcp-data-davidkhala.iam.gserviceaccount.com',
+                'private_key': private_key,
+            })
+        else:
+            return GCS()
 
+    def test_service_account(self):
+        GCSTests.gcs.fget(self)
 
-
-    def test_private_bucket(self):
-        """
-        TODO
-        https://arrow.apache.org/docs/python/filesystems.html#google-cloud-storage-file-system
-
-
-        """
-        uri ="gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow"
+    def test_parquet2arrow(self):
+        uri = "gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow"
         parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
         for record_batch in parquet.read_stream():
-            FS.write(uri,record_batch)
+            self.gcs.write(uri, record_batch)
+
+
 if __name__ == '__main__':
     unittest.main()

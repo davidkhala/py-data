@@ -1,7 +1,7 @@
 name: davidkhala.data.format
 on: push
 jobs:
-  avro-n-parquet:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -10,3 +10,5 @@ jobs:
           tests: format/tests
           test-entry-point: pytest
           working-directory: format
+        env:
+          PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
