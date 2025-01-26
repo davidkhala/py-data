@@ -2,10 +2,9 @@ import os
 import unittest
 
 from pyarrow import input_stream
-from requests.utils import stream_decode_response_unicode
 
-from davidkhala.data.format.arrow.fs import FS
 from davidkhala.data.format.arrow.gcp import GCS
+from davidkhala.data.format.arrow.local_fs import LocalFS
 from davidkhala.data.format.parquet import Parquet
 
 
@@ -36,9 +35,11 @@ class Samples(unittest.TestCase):
         parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
         arrow_batch_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.batch.arrow'
 
-        FS.write_batch(arrow_batch_path, parquet.read_batch())
+        fs = LocalFS()
+        fs.overwrite = True
+        fs.write_batch(arrow_batch_path, parquet.read_batch())
         arrow_stream_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.stream.arrow'
-        FS.write_stream(arrow_stream_path, parquet.read_stream())
+        fs.write_stream(arrow_stream_path, parquet.read_stream())
 
 
 class GCSTests(unittest.TestCase):
@@ -74,6 +75,7 @@ class GCSTests(unittest.TestCase):
         self.gcs.write_stream(stream_uri, parquet.read_stream())
         batch_uri = "gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.batch.arrow"
         self.gcs.write_batch(batch_uri, parquet.read_batch())
+
 
 if __name__ == '__main__':
     unittest.main()

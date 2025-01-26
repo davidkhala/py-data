@@ -1,8 +1,5 @@
-from typing import Iterable
-
 from davidkhala.gcp.auth import CredentialsInterface, ServiceAccountInfo
 from davidkhala.gcp.auth.options import from_service_account, ServiceAccount
-from pyarrow import NativeFile, RecordBatch, Table
 from pyarrow.fs import GcsFileSystem, FileInfo
 
 from davidkhala.data.format.arrow.fs import FS
@@ -11,6 +8,8 @@ from davidkhala.data.format.arrow.fs import FS
 class GCS(FS):
     """
     https://arrow.apache.org/docs/python/generated/pyarrow.fs.GcsFileSystem.html
+    - GcsFileSystem.open_append_stream(...) is not implemented.
+        - > pyarrow.lib.ArrowNotImplementedError: Append is not supported in GCS
     """
 
     def __init__(self, public_bucket: bool = False, *, location='ASIA-EAST2', credentials: CredentialsInterface = None):
@@ -32,28 +31,7 @@ class GCS(FS):
     def ls(self, bucket: str) -> FileInfo | list[FileInfo]:
         return super().ls(bucket)
 
-    def write_stream(self, uri, tables_or_batches: Iterable[RecordBatch | Table]):
-        """
-        pyarrow.lib.ArrowNotImplementedError: Append is not supported in GCS
-        :param uri:
-        :param tables_or_batches:
-        :return:
-        """
-        if uri.startswith('gs://'):
-            uri = uri[5:]
-
-        with self.fs.open_output_stream(uri) as stream:
-            FS.write_stream(stream, tables_or_batches)
-
-    def write_batch(self, uri, table_or_batch: RecordBatch | Table):
-        """
-        pyarrow.lib.ArrowNotImplementedError: Append is not supported in GCS
-        :param uri:
-        :param table_or_batch:
-        :return:
-        """
-        if uri.startswith('gs://'):
-            uri = uri[5:]
-
-        with self.fs.open_output_stream(uri) as stream:
-            FS.write_batch(stream, table_or_batch)
+    def open_output_stream(self, path, **kwargs):
+        if path.startswith('gs://'):
+            path = path[5:]
+        return super().open_output_stream(path)
