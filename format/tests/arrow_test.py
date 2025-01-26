@@ -2,6 +2,7 @@ import os
 import unittest
 
 from pyarrow import input_stream
+from requests.utils import stream_decode_response_unicode
 
 from davidkhala.data.format.arrow.fs import FS
 from davidkhala.data.format.arrow.gcp import GCS
@@ -33,9 +34,11 @@ class Samples(unittest.TestCase):
 
     def test_parquet2arrow(self):
         parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
-        arrow_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow'
-        for record_batch in parquet.read_stream():
-            FS.write(arrow_path, record_batch)
+        arrow_batch_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.batch.arrow'
+
+        FS.write_batch(arrow_batch_path, parquet.read_batch())
+        arrow_stream_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.stream.arrow'
+        FS.write_stream(arrow_stream_path, parquet.read_stream())
 
 
 class GCSTests(unittest.TestCase):
@@ -66,10 +69,11 @@ class GCSTests(unittest.TestCase):
         GCSTests.gcs.fget(self)
 
     def test_parquet2arrow(self):
-        uri = "gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.arrow"
         parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
-        self.gcs.write(uri, parquet.read_stream())
-
+        stream_uri = "gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.stream.arrow"
+        self.gcs.write_stream(stream_uri, parquet.read_stream())
+        batch_uri = "gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.batch.arrow"
+        self.gcs.write_batch(batch_uri, parquet.read_batch())
 
 if __name__ == '__main__':
     unittest.main()

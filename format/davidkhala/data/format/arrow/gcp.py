@@ -32,7 +32,7 @@ class GCS(FS):
     def ls(self, bucket: str) -> FileInfo | list[FileInfo]:
         return super().ls(bucket)
 
-    def write(self, uri, tables_or_batches: Iterable[RecordBatch | Table]):
+    def write_stream(self, uri, tables_or_batches: Iterable[RecordBatch | Table]):
         """
         pyarrow.lib.ArrowNotImplementedError: Append is not supported in GCS
         :param uri:
@@ -42,7 +42,18 @@ class GCS(FS):
         if uri.startswith('gs://'):
             uri = uri[5:]
 
-        stream: NativeFile = self.fs.open_output_stream(uri)
-        for table_or_batch in tables_or_batches:
-            FS.write(stream, table_or_batch)
-        stream.close()
+        with self.fs.open_output_stream(uri) as stream:
+            FS.write_stream(stream, tables_or_batches)
+
+    def write_batch(self, uri, table_or_batch: RecordBatch | Table):
+        """
+        pyarrow.lib.ArrowNotImplementedError: Append is not supported in GCS
+        :param uri:
+        :param table_or_batch:
+        :return:
+        """
+        if uri.startswith('gs://'):
+            uri = uri[5:]
+
+        with self.fs.open_output_stream(uri) as stream:
+            FS.write_batch(stream, table_or_batch)
