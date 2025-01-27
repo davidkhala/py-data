@@ -33,12 +33,12 @@ class Samples(unittest.TestCase):
 
     def test_parquet2arrow(self):
         parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
-        arrow_batch_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.batch.arrow'
+        arrow_batch_path = 'artifacts/gcp-data-davidkhala.dbt_davidkhala.country_codes.batch.arrow'
 
         fs = LocalFS()
         fs.overwrite = True
         fs.write_batch(arrow_batch_path, parquet.read_batch())
-        arrow_stream_path = 'fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.stream.arrow'
+        arrow_stream_path = 'artifacts/gcp-data-davidkhala.dbt_davidkhala.country_codes.stream.arrow'
         fs.write_stream(arrow_stream_path, parquet.read_stream())
 
 
