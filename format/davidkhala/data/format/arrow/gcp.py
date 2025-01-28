@@ -1,4 +1,4 @@
-from davidkhala.gcp.auth import CredentialsInterface, ServiceAccountInfo
+from davidkhala.gcp.auth import OptionsInterface, ServiceAccountInfo
 from davidkhala.gcp.auth.options import from_service_account, ServiceAccount
 from pyarrow.fs import GcsFileSystem, FileInfo
 
@@ -12,21 +12,21 @@ class GCS(FS):
         - > pyarrow.lib.ArrowNotImplementedError: Append is not supported in GCS
     """
 
-    def __init__(self, public_bucket: bool = False, *, location='ASIA-EAST2', credentials: CredentialsInterface = None):
+    def __init__(self, public_bucket: bool = False, *, location='ASIA-EAST2', auth_options: OptionsInterface = None):
         options = {
             'anonymous': public_bucket,
             'default_bucket_location': location,
         }
-        if credentials:
-            options['access_token'] = credentials.token
-            options['credential_token_expiration'] = credentials.expiry
+        if auth_options:
+            options['access_token'] = auth_options.token
+            options['credential_token_expiration'] = auth_options.expiry
         self.fs = GcsFileSystem(**options)
 
     @staticmethod
     def from_service_account(info: ServiceAccountInfo):
         service_account = from_service_account(info)
         ServiceAccount.token.fget(service_account)  # credential validation included
-        return GCS(credentials=service_account.credentials)
+        return GCS(auth_options=service_account)
 
     def ls(self, bucket: str) -> FileInfo | list[FileInfo]:
         return super().ls(bucket)

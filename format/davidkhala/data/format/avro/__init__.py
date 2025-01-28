@@ -1,12 +1,19 @@
+from dataclasses import dataclass
 from typing import Iterator, IO
-
 import fastavro
+from fastavro import reader, writer
+from fastavro.types import Schema
 
 
-def read(content) -> Iterator[dict]:
-    reader = fastavro.reader(content)
-    for record in reader:
-        yield record
+@dataclass
+class Data:
+    schema: Schema
+    records: Iterator[dict]
+
+
+def read(content) -> (Iterator[dict], Schema):
+    _reader = reader(content)
+    return (_ for _ in _reader), _reader.writer_schema,
 
 
 def is_avro(file_path: str):
@@ -15,3 +22,7 @@ def is_avro(file_path: str):
 
 def is_avro_data(buffer: IO):
     return fastavro.is_avro(buffer)
+
+
+def write(output_stream, schema: Schema, records: Iterator[dict]):
+    writer(output_stream, schema, records)

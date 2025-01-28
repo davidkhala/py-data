@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "davidkhala.data.format"
-version = "0.0.2"
+version = "0.0.3"
 description = ""
 authors = ["David Liu <david-khala@hotmail.com>"]
 readme = "README.md"
@@ -11,7 +11,7 @@ python = "^3.10"
 # for extras
 fastavro = { version = "*", optional = true }
 pyarrow = { version = "*", optional = true }
-davidkhala-gcp = { version = "*", optional = true, extras = ["auth"] }
+davidkhala-gcp = { version = "*", optional = true}
 [tool.poetry.group.dev.dependencies]
 pytest = "*"
 

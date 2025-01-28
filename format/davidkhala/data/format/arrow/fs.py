@@ -37,7 +37,7 @@ class FS:
         return self.fs.open_input_stream(file.path)
 
     def ls(self, base_dir: str) -> FileInfo | list[FileInfo]:
-        return self.fs.get_file_info(FileSelector(base_dir, recursive=True))
+        return self.fs.get_file_info(FileSelector(base_dir, recursive=True, allow_not_found=True))
 
     def write_stream(self, uri, tables_or_batches: Iterable[RecordBatch | Table]):
         with self.open_output_stream(uri) as stream:
