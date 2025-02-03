@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Iterator, IO
+
 import fastavro
 from fastavro import reader, writer
 from fastavro.types import Schema

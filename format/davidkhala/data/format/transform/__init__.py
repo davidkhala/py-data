@@ -39,7 +39,8 @@ class Arrow2Avro:
             return {
                 "type": "record",
                 "name": "struct",
-                "fields": [{"name": field.name, "type": Arrow2Avro.type(field.type)} for field in cast(StructType, arrow_type)]
+                "fields": [{"name": field.name, "type": Arrow2Avro.type(field.type)} for field in
+                           cast(StructType, arrow_type)]
             }
         else:
             raise ValueError(f"Unsupported PyArrow type: {arrow_type}")

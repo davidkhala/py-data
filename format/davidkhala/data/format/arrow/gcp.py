@@ -1,5 +1,5 @@
-from davidkhala.gcp.auth import OptionsInterface, ServiceAccountInfo
-from davidkhala.gcp.auth.options import from_service_account, ServiceAccount
+from davidkhala.gcp.auth import OptionsInterface
+from davidkhala.gcp.auth.service_account import Info, from_service_account, ServiceAccount
 from pyarrow.fs import GcsFileSystem, FileInfo
 
 from davidkhala.data.format.arrow.fs import FS
@@ -23,7 +23,7 @@ class GCS(FS):
         self.fs = GcsFileSystem(**options)
 
     @staticmethod
-    def from_service_account(info: ServiceAccountInfo):
+    def from_service_account(info: Info):
         service_account = from_service_account(info)
         ServiceAccount.token.fget(service_account)  # credential validation included
         return GCS(auth_options=service_account)

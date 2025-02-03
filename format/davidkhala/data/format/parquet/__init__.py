@@ -15,5 +15,6 @@ class Parquet:
 
     def read_batch(self) -> Table:
         return self.file.read()
-    def read_stream(self)-> Iterator[RecordBatch]:
+
+    def read_stream(self) -> Iterator[RecordBatch]:
         return self.file.iter_batches()

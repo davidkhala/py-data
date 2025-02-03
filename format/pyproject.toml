@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "davidkhala.data.format"
-version = "0.0.3"
+version = "0.0.4"
 description = ""
 authors = ["David Liu <david-khala@hotmail.com>"]
 readme = "README.md"
