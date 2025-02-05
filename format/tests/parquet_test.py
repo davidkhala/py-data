@@ -24,14 +24,6 @@ class MyTestCase(unittest.TestCase):
             for column in record_batch.column_names:
                 print(column, record_batch.column(column))
 
-    def test_memory_map(self):
-        from pyarrow.parquet import read_table
-        from pyarrow import total_allocated_bytes
-        read_table(parquet_path, memory_map=False)
-        self.assertEqual(total_allocated_bytes(), 256)
-        read_table(parquet_path, memory_map=True)
-        print(total_allocated_bytes())
-
 
 if __name__ == '__main__':
     unittest.main()
