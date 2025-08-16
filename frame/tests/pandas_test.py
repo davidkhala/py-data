@@ -11,7 +11,7 @@ class AirlineTestCase(unittest.TestCase):
     def test_duckDB(self):
         conn = duckdb.connect()
 
-        df_airports = pandas.read_csv("frame/tests/fixtures/airports.csv")
+        df_airports = pandas.read_csv("fixtures/airports.csv")
         conn.register("airports", df_airports)
         conn.close()
 
