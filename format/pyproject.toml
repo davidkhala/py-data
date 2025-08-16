@@ -1,24 +1,25 @@
-[tool.poetry]
+[project]
 name = "davidkhala.data.format"
 version = "0.0.5"
 description = ""
-authors = ["David Liu <david-khala@hotmail.com>"]
+authors = [{ name = "David Liu", email = "david-khala@hotmail.com" }]
+requires-python = "~=3.10"
 readme = "README.md"
-packages = [{ include = "davidkhala" }]
 
-[tool.poetry.dependencies]
-python = "^3.10"
-# for extras
-fastavro = { version = "*", optional = true }
-pyarrow = { version = "*", optional = true }
-davidkhala-gcp = { version = "*", optional = true}
-[tool.poetry.group.dev.dependencies]
-pytest = "*"
-
-[tool.poetry.extras]
+[project.optional-dependencies]
 avro = ["fastavro"]
-arrow = ['pyarrow']
-gcp = ['davidkhala-gcp']
+arrow = ["pyarrow"]
+gcp = ["davidkhala-gcp"]
+
+[dependency-groups]
+dev = ["pytest"]
+
+[tool.hatch.build.targets.sdist]
+include = ["davidkhala"]
+
+[tool.hatch.build.targets.wheel]
+include = ["davidkhala"]
+
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
