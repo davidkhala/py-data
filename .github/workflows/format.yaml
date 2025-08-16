@@ -1,7 +1,7 @@
-name: davidkhala.data.format
+name: davidkhala.data
 on: push
 jobs:
-  tests:
+  format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@main
@@ -12,3 +12,12 @@ jobs:
           working-directory: format
         env:
           PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
+  frame:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: davidkhala/uv-buildpack@main
+        with:
+          tests: frame/tests
+          test-entry-point: pytest
+          working-directory: frame
