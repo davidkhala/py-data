@@ -11,7 +11,7 @@ pandas = ["pandas"]
 polars = ["polars"]
 
 [dependency-groups]
-dev = ["pytest", "duckdb"]
+dev = ["pytest", "duckdb", "fsspec"]
 
 [tool.hatch.build.targets.sdist]
 include = ["davidkhala"]
