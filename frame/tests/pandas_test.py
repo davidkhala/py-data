@@ -15,6 +15,21 @@ class AirlineTestCase(unittest.TestCase):
         conn.register("airports", df_airports)
         conn.close()
 
+class SyntaxTestCase(unittest.TestCase):
+    def test_upsert(self):
+        from davidkhala.data.frame.pandas import upsert
+        prim_key ='id'
+        df = pandas.DataFrame({
+            prim_key: [1, 2],
+            'name': ['Alice', 'Bob'],
+            'score': [85, 90]
+        }).set_index(prim_key)
+        new_record = {'name': 'Charlie', 'score': 95, prim_key:2}
+        upsert(df, prim_key, new_record)
+
+        self.assertEqual(95, df.at[2, 'score'])
+
+
 
 
 if __name__ == '__main__':
