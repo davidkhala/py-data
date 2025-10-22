@@ -1,7 +1,9 @@
 import pandas as pd
 def upsert(df, *primary_keys: str, record: dict):
     index_keys = df.index.names if isinstance(df.index, pd.MultiIndex) else [df.index.name]
-    condition = True
+    condition = pd.Series(True, index=df.index)
+    if df.columns.empty and df.index.empty:
+        return pd.DataFrame([record])
 
     for key in primary_keys:
         if key in df.columns:
@@ -17,7 +19,5 @@ def upsert(df, *primary_keys: str, record: dict):
         for col, value in record.items():
             if col in df.columns:
                 df.loc[match_indices, col] = value
-    else:
-        df = pd.concat([df, pd.DataFrame([record])], ignore_index=True)
-
-    return df
+        return df
+    return pd.concat([df, pd.DataFrame([record])])
