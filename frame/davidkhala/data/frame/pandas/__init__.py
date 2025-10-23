@@ -7,21 +7,20 @@ def upsert(df: pd.DataFrame, *primary_keys: str, record: dict, verify_integrity=
 
     if original_index: df = df.reset_index()
 
-    condition = pd.Series(True, index=df.index)
+    condition = pd.Series(False, index=df.index)
     for key in primary_keys:
         if key not in df.columns:
             raise KeyError(f"Primary key '{key}' not found in DataFrame columns")
-        condition &= (df[key] == record[key])
+        condition |= (df[key] == record[key])
 
-    match_indices = df[condition].index
-
-    if not match_indices.empty:
+    match_row_i = df[condition].index
+    if not match_row_i.empty:
         for col, value in record.items():
             if col in df.columns:
-                df.loc[match_indices, col] = value
+                df.loc[match_row_i, col] = value
             else:
                 df[col] = None
-                df.loc[match_indices, col] = value
+                df.loc[match_row_i, col] = value
     else:
         new_row = pd.DataFrame([record])
         df = pd.concat([df, new_row], ignore_index=True)

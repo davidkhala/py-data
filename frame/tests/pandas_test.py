@@ -53,6 +53,15 @@ class UpsertTestCase(unittest.TestCase):
         self.assertEqual(2, len(df.columns))
         self.assertEqual(1, len(df.index.names))
 
+    def test_single_index3(self):
+        df = self.single_index_df
+        prim_key = df.index.name
+        new_record = {'name': 'Charlie', 'score': 95, prim_key: 3}
+        df = upsert(df, record =new_record)
+
+        self.assertEqual(3,len(df)) # should insert
+
+
     def test_empty(self):
         df = pandas.DataFrame()
         prim_key = 'id'
