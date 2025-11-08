@@ -21,3 +21,13 @@ jobs:
           tests: frame/tests
           test-entry-point: pytest
           working-directory: frame
+  dash:
+    runs-on: ubuntu-latest
+    env:
+      container: dash
+    steps:
+      - uses: actions/checkout@main
+      - run: export DOCKER_BUILDKIT=1
+      - run: docker build -t dash:latest visualization/app/dash
+      - run: docker run --name $container -d dash:latest
+      - run: curl https://raw.githubusercontent.com/davidkhala/containers/refs/heads/main/cli/health.sh | bash -s wait-until-healthy $container
