@@ -13,7 +13,7 @@ pretty = ['tabulate']
 
 [dependency-groups]
 dev = ["pytest", "duckdb", "fsspec"]
-
+dev-pandas = ["pandas-stubs"]
 [tool.hatch.build.targets.sdist]
 include = ["davidkhala"]
 
