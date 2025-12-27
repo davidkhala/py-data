@@ -10,8 +10,6 @@ jobs:
           tests: format/tests
           test-entry-point: pytest
           working-directory: format
-        env:
-          PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
   frame:
     runs-on: ubuntu-latest
     steps:
@@ -31,3 +29,14 @@ jobs:
       - run: docker build -t dash:latest visualization/app/dash
       - run: docker run --name $container -d dash:latest
       - run: curl https://raw.githubusercontent.com/davidkhala/containers/refs/heads/main/cli/health.sh | bash -s wait-until-healthy $container
+  integration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - uses: davidkhala/uv-buildpack@main
+        with:
+          tests: integration/tests
+          test-entry-point: pytest
+          working-directory: integration
+        env:
+          PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}

@@ -1,11 +1,9 @@
-import os
 import unittest
 
-from pyarrow import input_stream
-
 from davidkhala.data.format.arrow.gcp import GCS
-from davidkhala.data.format.arrow.local_fs import LocalFS
-from davidkhala.data.format.parquet import Parquet
+from davidkhala.data.format.arrow.parquet import Parquet
+from pyarrow import input_stream
+from pyarrow.parquet import ColumnSchema, ParquetSchema, ParquetLogicalType
 
 
 class Samples(unittest.TestCase):
@@ -31,51 +29,25 @@ class Samples(unittest.TestCase):
         with fs.open_input_stream(file_list[0]) as f:
             self.assertEqual(f.read(64), b'GROUP = FILE_HEADER\n  LANDSAT_SCENE_ID = "LC80010032013082LGN03"')
 
-    def test_parquet2arrow(self):
-        parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
-        arrow_batch_path = 'artifacts/gcp-data-davidkhala.dbt_davidkhala.country_codes.batch.arrow'
 
-        fs = LocalFS()
-        fs.overwrite = True
-        fs.write_batch(arrow_batch_path, parquet.read_batch())
-        arrow_stream_path = 'artifacts/gcp-data-davidkhala.dbt_davidkhala.country_codes.stream.arrow'
-        fs.write_stream(arrow_stream_path, parquet.read_stream())
+class ParquetTestCase(unittest.TestCase):
 
+    def setUp(self):
+        self.parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
 
-class GCSTests(unittest.TestCase):
-    """
-    tests on private bucket
-    """
-    bucket = "davidkhala-data"
+    def test_schema(self):
+        self.assertIsInstance(self.parquet.schema, ParquetSchema)
+        for field in self.parquet.schema:
+            self.assertIsInstance(field, ColumnSchema)
+            print(field)
+            self.assertIsInstance(field.logical_type, ParquetLogicalType)
+            self.assertEqual(str(field.logical_type), "String")
 
-    def test_ADC(self):
-        """
-        based on GCP ADC
-        """
-        for file in self.gcs.ls(self.bucket):
-            print(file.path)
-
-    @property
-    def gcs(self):
-        private_key = os.environ.get("PRIVATE_KEY")
-        if private_key:
-            return GCS.from_service_account({
-                'client_email': 'data-integration@gcp-data-davidkhala.iam.gserviceaccount.com',
-                'private_key': private_key,
-            })
-        else:
-            return GCS()
-
-    def test_service_account(self):
-        GCSTests.gcs.fget(self)
-
-    def test_parquet2arrow(self):
-        parquet = Parquet('fixtures/gcp-data-davidkhala.dbt_davidkhala.country_codes.parquet')
-        stream_uri = "gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.stream.arrow"
-        self.gcs.write_stream(stream_uri, parquet.read_stream())
-        batch_uri = "gs://davidkhala-data/gcp-data-davidkhala.dbt_davidkhala.country_codes.batch.arrow"
-        self.gcs.write_batch(batch_uri, parquet.read_batch())
-
-
+    def test_stream(self):
+        for record_batch in self.parquet.read_stream():
+            print(record_batch)
+            print('<<<<')
+            for column in record_batch.column_names:
+                print(column, record_batch.column(column))
 if __name__ == '__main__':
     unittest.main()

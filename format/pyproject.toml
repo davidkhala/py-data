@@ -3,7 +3,7 @@ name = "davidkhala.data.format"
 version = "0.0.5"
 description = ""
 authors = [{ name = "David Liu", email = "david-khala@hotmail.com" }]
-requires-python = "~=3.10"
+requires-python = ">=3.10"
 readme = "README.md"
 
 [project.optional-dependencies]

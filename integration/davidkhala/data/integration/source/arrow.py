@@ -8,11 +8,10 @@ from pyarrow.types import (is_int8, is_int16, is_int32, is_int64,
                            )
 
 
-class Arrow2Avro:
-    arrow: Table
+class ToAvro:
 
     def __init__(self, table: Table):
-        self.arrow = table
+        self.table = table
 
     @staticmethod
     def type(arrow_type: DataType):
@@ -34,12 +33,12 @@ class Arrow2Avro:
             return {"type": "int", "logicalType": "date"}
         elif is_list(arrow_type):
 
-            return {"type": "array", "items": Arrow2Avro.type(cast(ListType, arrow_type).value_type)}
+            return {"type": "array", "items": ToAvro.type(cast(ListType, arrow_type).value_type)}
         elif is_struct(arrow_type):
             return {
                 "type": "record",
                 "name": "struct",
-                "fields": [{"name": field.name, "type": Arrow2Avro.type(field.type)} for field in
+                "fields": [{"name": field.name, "type": ToAvro.type(field.type)} for field in
                            cast(StructType, arrow_type)]
             }
         else:
@@ -52,10 +51,10 @@ class Arrow2Avro:
             "name": "Root",
             "fields": list(map(lambda _field: {
                 "name": _field.name,
-                "type": Arrow2Avro.type(_field.type)
-            }, self.arrow.schema))
+                "type": ToAvro.type(_field.type)
+            }, self.table.schema))
         }
 
     @property
     def records(self):
-        return self.arrow.to_pylist()
+        return self.table.to_pylist()
