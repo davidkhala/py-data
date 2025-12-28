@@ -1,6 +1,6 @@
 [project]
 name = "davidkhala.data.integration"
-version = "0.0.2"
+version = "0.0.3"
 description = "integration hub of davidkhala.data"
 readme = "README.md"
 requires-python = ">=3.11"

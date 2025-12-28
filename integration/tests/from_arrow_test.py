@@ -2,7 +2,7 @@ import os
 import unittest
 
 from davidkhala.data.format.avro import read, is_avro, write
-from davidkhala.data.format.parquet import Parquet
+from davidkhala.data.format.arrow.parquet import Parquet
 from pyarrow import table, array, int32, string, list_, float32
 from davidkhala.data.format.arrow.local_fs import LocalFS
 
