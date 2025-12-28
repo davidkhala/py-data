@@ -3,6 +3,9 @@ on: push
 jobs:
   format:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: ['3.11', latest]
     steps:
       - uses: actions/checkout@main
       - uses: davidkhala/uv-buildpack@main
@@ -10,8 +13,12 @@ jobs:
           tests: format/tests
           test-entry-point: pytest
           working-directory: format
+          version: ${{matrix.version}}
   frame:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [ '3.10', latest ]
     steps:
       - uses: actions/checkout@main
       - uses: davidkhala/uv-buildpack@main
@@ -19,6 +26,7 @@ jobs:
           tests: frame/tests
           test-entry-point: pytest
           working-directory: frame
+          version: ${{matrix.version}}
   dash:
     runs-on: ubuntu-latest
     env:
@@ -31,6 +39,9 @@ jobs:
       - run: curl https://raw.githubusercontent.com/davidkhala/containers/refs/heads/main/cli/health.sh | bash -s wait-until-healthy $container
   integration:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [ '3.10', latest ]
     steps:
       - uses: actions/checkout@main
       - uses: davidkhala/uv-buildpack@main
@@ -38,5 +49,6 @@ jobs:
           tests: integration/tests
           test-entry-point: pytest
           working-directory: integration
+          version: ${{matrix.version}}
         env:
           PRIVATE_KEY: ${{secrets.PRIVATE_KEY}}
